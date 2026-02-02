@@ -1,0 +1,19 @@
+global:
+  scrape_interval: 5s # 每 5 秒 Ping 一次 (可自行調整)
+
+scrape_configs:
+  - job_name: 'blackbox_ping'
+    metrics_path: /probe
+    params:
+      module: [icmp_ping]  # 對應 blackbox.yml 的模組名稱
+    static_configs:
+      - targets:
+        - www.hinet.net
+        - 8.8.8.8
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: __param_target
+      - source_labels: [__param_target]
+        target_label: instance
+      - target_label: __address__
+        replacement: blackbox_exporter:9115  # 告訴 Prometheus 實際去問誰
